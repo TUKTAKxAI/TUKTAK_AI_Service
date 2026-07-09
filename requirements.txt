@@ -1,0 +1,79 @@
+# =====================================
+# FastAPI
+# =====================================
+fastapi[standard-no-fastapi-cloud-cli]
+python-multipart
+pydantic
+pydantic-settings
+
+# =====================================
+# LangGraph / LangChain
+# =====================================
+langgraph
+langchain
+langchain-core
+langchain-community
+langchain-text-splitters
+
+# =====================================
+# ChromaDB
+# =====================================
+chromadb
+langchain-chroma
+
+# =====================================
+# Embedding / HuggingFace
+# =====================================
+langchain-huggingface
+sentence-transformers
+transformers
+accelerate
+safetensors
+
+# =====================================
+# LLM Provider
+# OpenAI API를 쓸 경우
+# =====================================
+langchain-openai
+openai
+
+# =====================================
+# Document Processing
+# RAG 문서 처리용
+# =====================================
+pypdf
+beautifulsoup4
+lxml
+
+# =====================================
+# Image Processing
+# 이미지 품질 검사 / 전처리
+# =====================================
+Pillow
+opencv-python-headless
+
+# =====================================
+# Data / ML
+# =====================================
+numpy
+pandas
+scikit-learn
+joblib
+
+# =====================================
+# HTTP / Retry
+# =====================================
+httpx
+tenacity
+
+# =====================================
+# AWS
+# S3 이미지 연동용
+# =====================================
+boto3
+
+# =====================================
+# Testing
+# =====================================
+pytest
+pytest-asyncio
