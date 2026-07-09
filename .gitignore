@@ -1,0 +1,37 @@
+# Environment
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.pytest_cache/
+
+# Conda / venv
+.venv/
+venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+
+# Data
+data/chroma/
+data/documents/
+logs/
+
+# Model files
+models/
+*.pt
+*.pth
+*.bin
+*.safetensors
+*.onnx
+
+# OS
+.DS_Store
+Thumbs.db
