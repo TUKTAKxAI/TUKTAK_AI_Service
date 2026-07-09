@@ -155,3 +155,94 @@ http://localhost:8001/docs
 ```
 
 Swagger 문서 화면이 보이면 정상적으로 실행된 것입니다.
+
+---
+
+## 9. 현재 구현된 API
+
+```text
+GET  /health
+POST /api/v1/ai/estimates
+POST /api/v1/ai/risk-reports
+POST /api/v1/rag/documents
+GET  /api/v1/rag/collections
+```
+
+견적 API 예시:
+
+```bash
+curl -X POST http://localhost:8001/api/v1/ai/estimates ^
+  -H "Content-Type: application/json" ^
+  -d "{\"description\":\"벽지가 찢어져서 부분 보수가 필요해요.\",\"image_urls\":[\"https://example.com/wallpaper.jpg\"]}"
+```
+
+현재는 실제 모델을 호출하지 않고 LangGraph mock 파이프라인으로 동작합니다.
+확정되지 않은 기준값은 `app/core/constants.py`에 `TODO`와 `None`으로 분리했습니다.
+
+---
+
+## 10. AI 견적 파이프라인 MVP
+
+현재 LangGraph 흐름:
+
+```text
+validate_input
+→ check_image_quality
+→ validate_text
+→ analyze_text
+→ lookup_base_price_rule
+→ text_similarity_search 또는 text_and_image_similarity_search
+→ evaluate_similar_cases
+→ calculate_estimate_from_similar_cases 또는 calculate_estimate_with_base_price_and_llm
+→ validate_estimate_result
+```
+
+초기 구현 원칙:
+
+* 텍스트 유효성 검사는 임시 Rule Engine 구조만 둔다.
+* 유사사례 검색은 ChromaDB 연결 전까지 빈 결과를 반환한다.
+* 유사사례가 부족하면 `data/price_reference/base_price_table.sample.csv` 기준 단가표를 사용한다.
+* 실제 임베딩 모델, 텍스트 분류 모델, Vision LLM은 추후 설정값과 서비스 파일에 연결한다.
+
+---
+
+## 11. 기준 단가표
+
+샘플 단가표 위치:
+
+```text
+data/price_reference/base_price_table.sample.csv
+```
+
+운영용 단가표 후보:
+
+```text
+data/price_reference/base_price_table.csv
+data/price_reference/base_price_table.xlsx
+```
+
+운영용 파일은 `.gitignore`에 포함되어 있고, 샘플 CSV만 커밋 대상으로 둡니다.
+
+---
+
+## 12. 테스트
+
+의존성 설치 후 아래 명령으로 확인합니다.
+
+```bash
+pytest
+```
+
+간단 실행 확인:
+
+```bash
+python -m compileall app main.py
+```
+
+---
+
+## 13. Main Backend 연결
+
+백엔드 연결 지점은 `docs/backend-integration.md`에 정리했습니다.
+
+핵심은 `TUKTAK_Backend`의 `app/services/ai_stub.py` 직접 호출을 `httpx` 기반 AI Service 클라이언트 호출로 교체하는 것입니다.

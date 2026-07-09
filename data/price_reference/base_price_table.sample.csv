@@ -1,0 +1,4 @@
+price_rule_id,main_category,object_label,problem_label,repair_task,base_price_min,base_price_max,base_duration_minutes,difficulty_level,requires_license,material_cost_min,material_cost_max,labor_cost_min,labor_cost_max,visit_fee_min,visit_fee_max,extra_cost_notes,unit_type,unit_price_min,unit_price_max,is_image_important,is_active,version,updated_at,memo
+PR-001,INTERIOR,wallpaper,damage,wallpaper_partial_repair,50000,90000,60,LOW,false,10000,30000,30000,50000,10000,20000,동일 벽지 확보 여부에 따라 비용 변동,건,50000,90000,true,true,1.0,2026-07-09,벽지 부분 보수 기준
+PR-002,BATHROOM,tile,crack,tile_partial_repair,80000,150000,90,MEDIUM,false,20000,50000,50000,80000,10000,20000,타일 종류와 철거 범위에 따라 변동,건,80000,150000,true,true,1.0,2026-07-09,욕실 타일 부분 보수
+PR-003,PLUMBING,pipe,leak,pipe_leak_repair,70000,180000,120,HIGH,true,20000,70000,50000,90000,10000,20000,누수 위치 확인이 어려우면 현장 점검 필요,건,70000,180000,false,true,1.0,2026-07-09,배관 누수 수리

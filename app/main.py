@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 
+from app.api.v1.router import api_router, root_router
 from app.core.config import settings
 
 app = FastAPI(
@@ -8,18 +9,5 @@ app = FastAPI(
     description="TukTak AI 견적 및 RAG 리스크 분석 서비스",
 )
 
-
-@app.get("/")
-async def root() -> dict[str, str]:
-    return {
-        "service": settings.app_name,
-        "status": "running",
-    }
-
-
-@app.get("/health")
-async def health_check() -> dict[str, str]:
-    return {
-        "status": "healthy",
-        "service": settings.app_name,
-    }
+app.include_router(root_router)
+app.include_router(api_router)
