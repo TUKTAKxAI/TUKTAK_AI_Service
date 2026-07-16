@@ -25,6 +25,8 @@ def test_create_estimate_with_base_price_reference() -> None:
     assert response.status_code == 200
     body = response.json()
     assert body["success"] is True
+    assert body["status"] == "completed"
+    assert body["code"] == "ESTIMATE_COMPLETED"
     assert body["estimate"]["repair_task"] == "wallpaper_partial_repair"
     assert body["estimate"]["expected_price_min"] == 50000
     assert body["estimate"]["expected_price_max"] == 90000
@@ -36,5 +38,6 @@ def test_create_estimate_rejects_too_short_description() -> None:
     assert response.status_code == 200
     body = response.json()
     assert body["success"] is False
+    assert body["status"] == "validation_failed"
+    assert body["code"] == "ESTIMATE_VALIDATION_TOO_SHORT"
     assert body["error"]["validity_label"] == "too_short"
-

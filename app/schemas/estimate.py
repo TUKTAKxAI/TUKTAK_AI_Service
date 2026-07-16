@@ -1,3 +1,4 @@
+from enum import StrEnum
 from typing import Any
 
 from pydantic import BaseModel, Field
@@ -10,6 +11,13 @@ class EstimateRequest(BaseModel):
     image_paths: list[str] = Field(default_factory=list)
     main_category_hint: str | None = None
     region_code: str | None = None
+
+
+class EstimateResponseStatus(StrEnum):
+    VALIDATION_FAILED = "validation_failed"
+    NEEDS_MORE_INFO = "needs_more_info"
+    COMPLETED = "completed"
+    SERVICE_ERROR = "service_error"
 
 
 class EstimateItem(BaseModel):
@@ -38,6 +46,7 @@ class EstimateResult(BaseModel):
 
 
 class EstimateError(BaseModel):
+    code: str
     validity_label: str
     message: str
     missing_info: list[str] = Field(default_factory=list)
@@ -45,6 +54,8 @@ class EstimateError(BaseModel):
 
 class EstimateResponse(BaseModel):
     success: bool
+    status: EstimateResponseStatus
+    code: str
+    message: str
     estimate: EstimateResult | None = None
     error: EstimateError | None = None
-
