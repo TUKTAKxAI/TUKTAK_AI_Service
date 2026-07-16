@@ -33,7 +33,7 @@ def test_create_estimate_with_base_price_reference() -> None:
 
 
 def test_create_estimate_rejects_too_short_description() -> None:
-    response = client.post("/api/v1/ai/estimates", json={"description": "벽지"})
+    response = client.post("/api/v1/ai/estimates", json={"description": "ㅋ"})
 
     assert response.status_code == 200
     body = response.json()
@@ -41,3 +41,15 @@ def test_create_estimate_rejects_too_short_description() -> None:
     assert body["status"] == "validation_failed"
     assert body["code"] == "ESTIMATE_VALIDATION_TOO_SHORT"
     assert body["error"]["validity_label"] == "too_short"
+
+
+def test_create_estimate_returns_needs_more_info() -> None:
+    response = client.post("/api/v1/ai/estimates", json={"description": "벽지"})
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["success"] is False
+    assert body["status"] == "needs_more_info"
+    assert body["code"] == "ESTIMATE_NEEDS_MORE_INFO"
+    assert body["error"]["validity_label"] == "missing_symptom"
+    assert body["error"]["missing_info"] == ["repair_symptom"]
