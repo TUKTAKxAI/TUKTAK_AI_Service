@@ -11,6 +11,12 @@ def route_text_validation_result(state: EstimateState) -> str:
     return "analyze_text"
 
 
+def route_text_analysis_result(state: EstimateState) -> str:
+    if state.get("error_message"):
+        return "end"
+    return "lookup_base_price_rule"
+
+
 def route_similar_cases_enough(state: EstimateState) -> str:
     if state.get("similar_cases_enough"):
         return "calculate_estimate_from_similar_cases"

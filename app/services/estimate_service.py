@@ -94,18 +94,25 @@ class EstimateService:
         )
 
     def _classify_error_status(self, state: dict) -> EstimateResponseStatus:
-        validity_label = state.get("validity_label")
-        if validity_label in VALIDATION_FAILURE_LABELS:
+        validity_labels = self._split_validity_labels(state.get("validity_label"))
+        if validity_labels & VALIDATION_FAILURE_LABELS and not state.get("missing_info"):
             return EstimateResponseStatus.VALIDATION_FAILED
         if state.get("missing_info"):
             return EstimateResponseStatus.NEEDS_MORE_INFO
+        if validity_labels & VALIDATION_FAILURE_LABELS:
+            return EstimateResponseStatus.VALIDATION_FAILED
         return EstimateResponseStatus.SERVICE_ERROR
 
     def _response_code(self, status: EstimateResponseStatus, validity_label: str) -> str:
         if status == EstimateResponseStatus.VALIDATION_FAILED:
-            return f"ESTIMATE_VALIDATION_{validity_label.upper()}"
+            labels = sorted(self._split_validity_labels(validity_label))
+            primary_label = labels[0] if labels else validity_label
+            return f"ESTIMATE_VALIDATION_{primary_label.upper()}"
         if status == EstimateResponseStatus.NEEDS_MORE_INFO:
             return "ESTIMATE_NEEDS_MORE_INFO"
         if status == EstimateResponseStatus.SERVICE_ERROR:
             return "ESTIMATE_SERVICE_ERROR"
         return "ESTIMATE_COMPLETED"
+
+    def _split_validity_labels(self, validity_label: str | None) -> set[str]:
+        return {label.strip() for label in (validity_label or "").split("|") if label.strip()}

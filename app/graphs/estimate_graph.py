@@ -19,6 +19,7 @@ from app.graphs.nodes.validate_text import validate_text
 from app.graphs.routes import (
     route_image_similarity_needed,
     route_similar_cases_enough,
+    route_text_analysis_result,
     route_text_validation_result,
 )
 from app.graphs.state import EstimateState
@@ -50,7 +51,14 @@ def build_estimate_graph():
             "end": END,
         },
     )
-    graph.add_edge("analyze_text", "lookup_base_price_rule")
+    graph.add_conditional_edges(
+        "analyze_text",
+        route_text_analysis_result,
+        {
+            "lookup_base_price_rule": "lookup_base_price_rule",
+            "end": END,
+        },
+    )
     graph.add_edge("lookup_base_price_rule", "mark_image_similarity_route")
     graph.add_conditional_edges(
         "mark_image_similarity_route",

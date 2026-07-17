@@ -11,5 +11,10 @@ def analyze_text(state: EstimateState) -> EstimateState:
         main_category_hint=state.get("main_category"),
     )
     state.update(result)
+    missing_info = state.get("missing_info") or []
+    if missing_info:
+        state["error_message"] = "Additional structured repair information is required before creating an estimate."
+        return state
+    if state.get("validity_label") != ValidityLabel.VALID_REPAIR_REQUEST.value:
+        state["error_message"] = "Structured repair request analysis did not classify this as a valid repair request."
     return state
-
