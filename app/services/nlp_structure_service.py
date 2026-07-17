@@ -15,6 +15,13 @@ SINGLE_LABEL_FIELDS = [
 ]
 MULTI_LABEL_FIELD = "missing_info"
 NO_MISSING_INFO_LABEL = "없음"
+REQUIRED_MODEL_FILES = {
+    "config.json",
+    "label_maps.json",
+    "model.safetensors",
+    "tokenizer.json",
+    "tokenizer_config.json",
+}
 
 
 class NLPStructureService:
@@ -48,6 +55,7 @@ class _NLPStructureRuntime:
         self.torch = torch
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.model_dir = Path(settings.nlp_structuring_model_path)
+        _ensure_model_dir(self.model_dir)
         self.label_maps = _load_json(self.model_dir / "label_maps.json")
         self.tokenizer = AutoTokenizer.from_pretrained(str(self.model_dir))
 
@@ -136,6 +144,40 @@ class _NLPStructureRuntime:
 @lru_cache(maxsize=1)
 def _load_runtime() -> _NLPStructureRuntime:
     return _NLPStructureRuntime()
+
+
+def _ensure_model_dir(model_dir: Path) -> None:
+    missing_files = [name for name in REQUIRED_MODEL_FILES if not (model_dir / name).exists()]
+    if not missing_files:
+        return
+
+    if settings.nlp_structuring_auto_download and settings.nlp_structuring_hf_repo_id:
+        try:
+            from huggingface_hub import snapshot_download
+        except ImportError as exc:
+            raise RuntimeError(
+                "huggingface_hub is required to download the NLP structuring model. "
+                "Install it or pre-populate the local model directory."
+            ) from exc
+
+        model_dir.mkdir(parents=True, exist_ok=True)
+        snapshot_download(
+            repo_id=settings.nlp_structuring_hf_repo_id,
+            revision=settings.nlp_structuring_hf_revision,
+            token=settings.nlp_structuring_hf_token,
+            local_dir=str(model_dir),
+            local_dir_use_symlinks=False,
+        )
+        missing_files = [name for name in REQUIRED_MODEL_FILES if not (model_dir / name).exists()]
+        if not missing_files:
+            return
+
+    raise FileNotFoundError(
+        "NLP structuring model files are missing. "
+        f"model_dir={model_dir}, missing_files={missing_files}. "
+        "Set NLP_STRUCTURING_HF_REPO_ID to download from HuggingFace Hub, "
+        "or place the model files in the configured local directory."
+    )
 
 
 def _load_json(path: Path) -> dict[str, Any]:

@@ -17,6 +17,7 @@ VALIDATION_FAILURE_LABELS = {
     ValidityLabel.UNSAFE_INPUT.value,
     ValidityLabel.PRICE_ONLY.value,
     ValidityLabel.IMAGE_REQUIRED.value,
+    ValidityLabel.IMAGE_QUALITY_INVALID.value,
 }
 
 
@@ -95,12 +96,10 @@ class EstimateService:
 
     def _classify_error_status(self, state: dict) -> EstimateResponseStatus:
         validity_labels = self._split_validity_labels(state.get("validity_label"))
-        if validity_labels & VALIDATION_FAILURE_LABELS and not state.get("missing_info"):
+        if validity_labels & VALIDATION_FAILURE_LABELS:
             return EstimateResponseStatus.VALIDATION_FAILED
         if state.get("missing_info"):
             return EstimateResponseStatus.NEEDS_MORE_INFO
-        if validity_labels & VALIDATION_FAILURE_LABELS:
-            return EstimateResponseStatus.VALIDATION_FAILED
         return EstimateResponseStatus.SERVICE_ERROR
 
     def _response_code(self, status: EstimateResponseStatus, validity_label: str) -> str:

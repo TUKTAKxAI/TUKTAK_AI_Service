@@ -23,6 +23,10 @@ class Settings(BaseSettings):
     nlp_structuring_model_name: str = "KLUE-RoBERTa-base"
     nlp_structuring_base_model_name: str = "klue/roberta-base"
     nlp_structuring_model_path: str = "data/models/KLUE-RoBERTa-base"
+    nlp_structuring_hf_repo_id: str | None = None
+    nlp_structuring_hf_revision: str | None = None
+    nlp_structuring_hf_token: str | None = None
+    nlp_structuring_auto_download: bool = True
     nlp_structuring_max_length: int = 192
     nlp_structuring_missing_threshold: float = 0.5
 

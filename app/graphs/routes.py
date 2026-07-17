@@ -5,6 +5,12 @@ def route_image_similarity_needed(state: EstimateState) -> str:
     return "text_and_image_similarity_search" if state.get("use_image_similarity") else "text_similarity_search"
 
 
+def route_image_quality_result(state: EstimateState) -> str:
+    if state.get("error_message"):
+        return "end"
+    return "validate_text"
+
+
 def route_text_validation_result(state: EstimateState) -> str:
     if state.get("error_message"):
         return "end"

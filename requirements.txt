@@ -25,6 +25,7 @@ langchain-chroma
 # Embedding / HuggingFace
 # =====================================
 langchain-huggingface
+huggingface_hub
 sentence-transformers
 transformers
 accelerate

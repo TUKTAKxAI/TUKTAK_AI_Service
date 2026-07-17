@@ -17,6 +17,7 @@ from app.graphs.nodes.search_similar_cases import (
 from app.graphs.nodes.validate_input import validate_input
 from app.graphs.nodes.validate_text import validate_text
 from app.graphs.routes import (
+    route_image_quality_result,
     route_image_similarity_needed,
     route_similar_cases_enough,
     route_text_analysis_result,
@@ -42,7 +43,14 @@ def build_estimate_graph():
 
     graph.add_edge(START, "validate_input")
     graph.add_edge("validate_input", "check_image_quality")
-    graph.add_edge("check_image_quality", "validate_text")
+    graph.add_conditional_edges(
+        "check_image_quality",
+        route_image_quality_result,
+        {
+            "validate_text": "validate_text",
+            "end": END,
+        },
+    )
     graph.add_conditional_edges(
         "validate_text",
         route_text_validation_result,
