@@ -33,8 +33,8 @@ def evaluate_similar_cases(state: EstimateState) -> EstimateState:
 
     price_spread = max(prices) - min(prices)
     duration_spread = max(durations) - min(durations)
-    price_ok = PRICE_VARIANCE_THRESHOLD is not None and price_spread <= PRICE_VARIANCE_THRESHOLD
-    duration_ok = DURATION_VARIANCE_THRESHOLD is not None and duration_spread <= DURATION_VARIANCE_THRESHOLD
+    price_ok = PRICE_VARIANCE_THRESHOLD is None or price_spread <= PRICE_VARIANCE_THRESHOLD
+    duration_ok = DURATION_VARIANCE_THRESHOLD is None or duration_spread <= DURATION_VARIANCE_THRESHOLD
     state["similar_cases_enough"] = price_ok and duration_ok
     state["similar_case_stats"] = {
         "price_min": min(prices),
@@ -44,4 +44,3 @@ def evaluate_similar_cases(state: EstimateState) -> EstimateState:
         "duration_spread": duration_spread,
     }
     return state
-

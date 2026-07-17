@@ -19,6 +19,7 @@ class Settings(BaseSettings):
     price_reference_file_path: str = "data/price_reference/base_price_table.sample.csv"
 
     embedding_model_name: str = "BAAI/bge-m3"
+    image_embedding_model_name: str = "nomic-ai/nomic-embed-vision-v1.5"
 
     nlp_structuring_model_name: str = "KLUE-RoBERTa-base"
     nlp_structuring_base_model_name: str = "klue/roberta-base"

@@ -1,4 +1,5 @@
 import json
+import re
 from functools import lru_cache
 from pathlib import Path
 from typing import Any
@@ -14,6 +15,19 @@ SINGLE_LABEL_FIELDS = [
     "validity_label",
 ]
 MULTI_LABEL_FIELD = "missing_info"
+MISSING_INFO_LABEL_ALIASES = {
+    "브랜드/모델명": {"브랜드/모델명", "브랜드", "모델명", "모델", "brand_model"},
+    "repair_object": {"repair_object", "수리 대상", "대상", "물건", "제품"},
+    "repair_symptom": {"repair_symptom", "고장 증상", "증상", "문제"},
+    "main_category": {"main_category", "서비스 분야", "분야", "카테고리"},
+    "object_label": {"object_label", "수리 대상", "대상", "제품"},
+    "problem_label": {"problem_label", "고장 증상", "증상", "문제"},
+}
+BRAND_MODEL_HINT_PATTERN = re.compile(
+    r"(삼성|엘지|LG|대우|위니아|캐리어|딤채|쿠쿠|쿠첸|SK매직|코웨이|청호|"
+    r"에어컨|냉장고|세탁기|건조기|보일러|TV|모델|브랜드)",
+    re.IGNORECASE,
+)
 NO_MISSING_INFO_LABEL = "없음"
 REQUIRED_MODEL_FILES = {
     "config.json",
@@ -29,6 +43,7 @@ class NLPStructureService:
         runtime = _load_runtime()
         prediction = runtime.predict(description)
         missing_info = _split_missing_info(prediction[MULTI_LABEL_FIELD])
+        missing_info = _remove_provided_missing_info(description, missing_info)
 
         return {
             "main_category": prediction["main_category"],
@@ -188,6 +203,52 @@ def _load_json(path: Path) -> dict[str, Any]:
 def _split_missing_info(value: str | None) -> list[str]:
     labels = [item.strip() for item in (value or "").split("|") if item.strip()]
     return [label for label in labels if label != NO_MISSING_INFO_LABEL]
+
+
+def _remove_provided_missing_info(description: str, missing_info: list[str]) -> list[str]:
+    answers = _extract_additional_info_answers(description)
+    if not answers:
+        return missing_info
+
+    remaining = []
+    for label in missing_info:
+        if not _has_answer_for_missing_label(label, answers):
+            remaining.append(label)
+    return remaining
+
+
+def _extract_additional_info_answers(description: str) -> dict[str, str]:
+    answers: dict[str, str] = {}
+    for line in description.splitlines():
+        if ":" not in line:
+            continue
+        key, value = line.split(":", 1)
+        normalized_key = _normalize_label_text(key)
+        value = value.strip()
+        if normalized_key and value:
+            answers[normalized_key] = value
+    return answers
+
+
+def _has_answer_for_missing_label(label: str, answers: dict[str, str]) -> bool:
+    normalized_label = _normalize_label_text(label)
+    aliases = {
+        _normalize_label_text(alias)
+        for alias in MISSING_INFO_LABEL_ALIASES.get(label, {label})
+    }
+    aliases.add(normalized_label)
+
+    for answer_key, answer_value in answers.items():
+        answer_key_parts = set(answer_key.split("/"))
+        if answer_key in aliases or aliases & answer_key_parts:
+            return True
+        if normalized_label == _normalize_label_text("브랜드/모델명") and BRAND_MODEL_HINT_PATTERN.search(answer_value):
+            return True
+    return False
+
+
+def _normalize_label_text(value: str) -> str:
+    return re.sub(r"\s+", "", value.strip().lower())
 
 
 def _format_prediction(prediction: dict[str, str]) -> str:

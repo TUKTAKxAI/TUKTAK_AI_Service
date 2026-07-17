@@ -27,6 +27,7 @@ data/price_reference/base_price_table.csv
 data/price_reference/base_price_table.xlsx
 !data/price_reference/base_price_table.sample.csv
 logs/
+tmp/
 
 # Model files
 models/

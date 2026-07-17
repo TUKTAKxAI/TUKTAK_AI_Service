@@ -20,6 +20,7 @@ class EstimateState(TypedDict, total=False):
     similar_cases: list[dict[str, Any]]
     similar_cases_enough: bool
     use_image_similarity: bool
+    image_similarity_category: str | None
     min_price: int | None
     max_price: int | None
     duration_minutes: int | None
@@ -30,4 +31,3 @@ class EstimateState(TypedDict, total=False):
     risk_summary: str | None
     warnings: list[str]
     error_message: str | None
-
