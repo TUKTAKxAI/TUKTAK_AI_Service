@@ -17,6 +17,7 @@ class ValidityLabel(StrEnum):
 
 TOP_K_SIMILAR_CASES = 3
 SIMILAR_CASE_PRICE_MARGIN_RATE = 0.10
+MAX_ESTIMATE_PRICE_RANGE_RATIO = 1.5
 
 # TODO: 팀 기준 확정 후 None 값을 실제 기준으로 교체한다.
 SIMILARITY_THRESHOLD: float | None = None

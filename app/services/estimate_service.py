@@ -86,6 +86,7 @@ class EstimateService:
                 missing_info=state.get("missing_info", []),
                 estimate_method=state.get("estimate_method"),
                 llm_used=state.get("llm_used", False),
+                summary=state.get("llm_summary"),
                 estimate_items=state.get("estimate_items", []),
                 warnings=state.get("warnings", []),
                 similar_cases=state.get("similar_cases", []),

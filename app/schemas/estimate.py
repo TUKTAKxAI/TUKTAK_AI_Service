@@ -39,6 +39,7 @@ class EstimateResult(BaseModel):
     missing_info: list[str] = Field(default_factory=list)
     estimate_method: str | None = None
     llm_used: bool = False
+    summary: str | None = None
     estimate_items: list[EstimateItem] = Field(default_factory=list)
     warnings: list[str] = Field(default_factory=list)
     similar_cases: list[dict[str, Any]] = Field(default_factory=list)

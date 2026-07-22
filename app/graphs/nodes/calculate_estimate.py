@@ -1,8 +1,10 @@
 from collections import Counter
 from statistics import mean
 
-from app.core.constants import SIMILAR_CASE_PRICE_MARGIN_RATE, ValidityLabel
+from app.core.constants import MAX_ESTIMATE_PRICE_RANGE_RATIO, SIMILAR_CASE_PRICE_MARGIN_RATE, ValidityLabel
 from app.graphs.state import EstimateState
+from app.services.estimate_price_range_service import constrain_price_range
+from app.services.openai_estimate_service import OpenAIEstimateService
 
 
 CATEGORICAL_ESTIMATE_FIELDS = ("main_category", "object_label", "problem_label", "repair_task")
@@ -20,6 +22,7 @@ def calculate_estimate_from_similar_cases(state: EstimateState) -> EstimateState
 
     price_min = _apply_price_margin(min(prices), -SIMILAR_CASE_PRICE_MARGIN_RATE)
     price_max = _apply_price_margin(max(prices), SIMILAR_CASE_PRICE_MARGIN_RATE)
+    price_min, price_max, range_constrained = constrain_price_range(price_min, price_max)
     duration_mean = int(mean(durations))
 
     state["min_price"] = price_min
@@ -48,15 +51,24 @@ def calculate_estimate_from_similar_cases(state: EstimateState) -> EstimateState
             for field in CATEGORICAL_ESTIMATE_FIELDS
         },
     }
+    if not _apply_openai_estimate_if_available(state) and range_constrained:
+        warnings = list(state.get("warnings") or [])
+        warnings.append(f"Estimate price range was narrowed to stay within {MAX_ESTIMATE_PRICE_RANGE_RATIO}x.")
+        state["warnings"] = warnings
     return state
 
 
 def calculate_estimate_with_base_price_and_llm(state: EstimateState) -> EstimateState:
     rule = state.get("base_price_rule")
     warnings = list(state.get("warnings") or [])
+    state["warnings"] = warnings
     if rule:
-        state["min_price"] = int(rule["base_price_min"])
-        state["max_price"] = int(rule["base_price_max"])
+        price_min, price_max, range_constrained = constrain_price_range(
+            int(rule["base_price_min"]),
+            int(rule["base_price_max"]),
+        )
+        state["min_price"] = price_min
+        state["max_price"] = price_max
         state["duration_minutes"] = int(rule["base_duration_minutes"])
         state["confidence"] = 0.68
         state["estimate_method"] = "base_price_reference"
@@ -66,6 +78,9 @@ def calculate_estimate_with_base_price_and_llm(state: EstimateState) -> Estimate
             {"name": "labor_cost", "price_min": int(rule["labor_cost_min"]), "price_max": int(rule["labor_cost_max"])},
             {"name": "material_cost", "price_min": int(rule["material_cost_min"]), "price_max": int(rule["material_cost_max"])},
         ]
+        if not _apply_openai_estimate_if_available(state) and range_constrained:
+            warnings.append(f"Estimate price range was narrowed to stay within {MAX_ESTIMATE_PRICE_RANGE_RATIO}x.")
+            state["warnings"] = warnings
     else:
         state["min_price"] = None
         state["max_price"] = None
@@ -73,9 +88,10 @@ def calculate_estimate_with_base_price_and_llm(state: EstimateState) -> Estimate
         state["confidence"] = 0.3
         state["estimate_method"] = "needs_llm_or_price_reference"
         state["llm_used"] = False
-        state["missing_info"] = list(set((state.get("missing_info") or []) + ["base_price_rule"]))
-        warnings.append("Base price rule and similar cases are not enough. LLM or fallback data is required.")
-    state["warnings"] = warnings
+        if not _apply_openai_estimate_if_available(state):
+            state["missing_info"] = list(set((state.get("missing_info") or []) + ["base_price_rule"]))
+            warnings.append("Base price rule and similar cases are not enough. LLM or fallback data is required.")
+            state["warnings"] = warnings
     return state
 
 
@@ -106,3 +122,34 @@ def _most_common_case_value(cases: list[dict], field: str) -> str | None:
 def _apply_price_margin(price: int, margin_rate: float) -> int:
     adjusted = int(price * (1 + margin_rate))
     return max(0, round(adjusted / 1000) * 1000)
+
+
+def _apply_openai_estimate_if_available(state: EstimateState) -> bool:
+    warnings = list(state.get("warnings") or [])
+    service = OpenAIEstimateService()
+    if not service.can_generate(state):
+        return False
+
+    try:
+        estimate = service.generate_estimate(state)
+    except Exception as exc:
+        warnings.append(f"GPT estimate generation failed; fallback estimate was used. reason={exc}")
+        state["warnings"] = warnings
+        return False
+
+    price_min, price_max, range_constrained = constrain_price_range(
+        estimate["expected_price_min"],
+        estimate["expected_price_max"],
+    )
+    state["min_price"] = price_min
+    state["max_price"] = price_max
+    state["duration_minutes"] = estimate["expected_duration_minutes"]
+    state["confidence"] = estimate["confidence_score"]
+    state["estimate_items"] = estimate["estimate_items"]
+    state["estimate_method"] = "gpt5_mini_final_estimate"
+    state["llm_used"] = True
+    state["llm_summary"] = estimate["summary"]
+    if range_constrained:
+        estimate["warnings"].append(f"Estimate price range was narrowed to stay within {MAX_ESTIMATE_PRICE_RANGE_RATIO}x.")
+    state["warnings"] = warnings + estimate["warnings"]
+    return True

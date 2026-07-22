@@ -67,11 +67,11 @@ def test_calculate_estimate_from_similar_cases_uses_mode_labels_and_buffered_pri
     assert result["object_label"] == "wall"
     assert result["problem_label"] == "crack"
     assert result["repair_task"] == "wall_crack_repair"
-    assert result["min_price"] == 90000
-    assert result["max_price"] == 165000
+    assert result["min_price"] == 102000
+    assert result["max_price"] == 153000
     assert result["duration_minutes"] == 90
     assert result["estimate_items"] == [
-        {"name": "similar_case_based_estimate", "price_min": 90000, "price_max": 165000}
+        {"name": "similar_case_based_estimate", "price_min": 102000, "price_max": 153000}
     ]
     assert result["similar_case_stats"]["raw_price_min"] == 100000
     assert result["similar_case_stats"]["raw_price_max"] == 150000

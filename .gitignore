@@ -23,7 +23,6 @@ env/
 data/chroma/
 data/documents/
 data/models/
-data/price_reference/base_price_table.csv
 data/price_reference/base_price_table.xlsx
 !data/price_reference/base_price_table.sample.csv
 logs/

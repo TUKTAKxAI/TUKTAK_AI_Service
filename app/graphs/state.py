@@ -27,6 +27,7 @@ class EstimateState(TypedDict, total=False):
     confidence: float | None
     estimate_method: str | None
     llm_used: bool
+    llm_summary: str | None
     estimate_items: list[dict[str, Any]]
     risk_summary: str | None
     warnings: list[str]
