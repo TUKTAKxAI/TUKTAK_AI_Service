@@ -13,7 +13,7 @@ class Settings(BaseSettings):
 
     chroma_path: str = "./data/chroma"
     chroma_repair_case_collection: str = "repair_cases"
-    chroma_risk_document_collection: str = "risk_documents"
+    chroma_risk_document_collection: str = "risk_documents_ko_sroberta_v2"
     chroma_repair_manual_collection: str = "repair_manuals"
     chroma_price_reference_collection: str = "price_references"
     price_reference_file_path: str = "data/price_reference/base_price_table.csv"
@@ -33,8 +33,20 @@ class Settings(BaseSettings):
 
     openai_api_key: str | None = None
     openai_api_key_ai_estimate: str | None = None
+    openai_api_key_ai_riskreport: str | None = None
     openai_estimate_model: str = "gpt-5-mini"
     openai_estimate_timeout_seconds: float = 60.0
+    openai_risk_report_model: str = "gpt-5-mini"
+    openai_risk_report_timeout_seconds: float = 60.0
+
+    risk_embedding_model_name: str = "jhgan/ko-sroberta-multitask"
+    risk_rag_metadata_path: str | None = "data/rag_documents/02_메타데이터/rag_documents_metadata_통합본.jsonl"
+    risk_rag_top_k: int = 3
+    risk_rag_price_threshold: float = 0.30
+    risk_rag_extra_cost_threshold: float = 0.55
+    risk_rag_safety_threshold: float = 0.60
+    risk_rag_contract_threshold: float = 0.60
+    risk_rag_field_threshold: float = 0.65
 
     aws_region: str = "ap-northeast-2"
     s3_bucket_name: str | None = None
