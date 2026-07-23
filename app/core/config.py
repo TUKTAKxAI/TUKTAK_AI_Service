@@ -51,6 +51,8 @@ class Settings(BaseSettings):
 
     aws_region: str = "ap-northeast-2"
     s3_bucket_name: str | None = None
+    warmup_on_startup: bool = False
+    warmup_risk_embedding: bool = False
 
     model_config = SettingsConfigDict(
         env_file=".env",

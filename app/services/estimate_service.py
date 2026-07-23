@@ -7,6 +7,7 @@ from app.schemas.estimate import (
     EstimateResponseStatus,
     EstimateResult,
 )
+from app.services.s3_image_loader import S3ImageDownloadSession
 
 
 VALIDATION_FAILURE_LABELS = {
@@ -24,18 +25,19 @@ VALIDATION_FAILURE_LABELS = {
 class EstimateService:
     def create_estimate(self, payload: EstimateRequest) -> EstimateResponse:
         try:
-            state = estimate_graph.invoke(
-                {
-                    "request_id": payload.request_id or "",
-                    "description": payload.description,
-                    "image_urls": payload.image_urls,
-                    "image_paths": payload.image_paths,
-                    "main_category": payload.main_category_hint,
-                    "missing_info": [],
-                    "warnings": [],
-                    "similar_cases": [],
-                }
-            )
+            with S3ImageDownloadSession(payload.image_s3_keys) as downloaded_image_paths:
+                state = estimate_graph.invoke(
+                    {
+                        "request_id": payload.request_id or "",
+                        "description": payload.description,
+                        "image_urls": payload.image_urls,
+                        "image_paths": [*payload.image_paths, *downloaded_image_paths],
+                        "main_category": payload.main_category_hint,
+                        "missing_info": [],
+                        "warnings": [],
+                        "similar_cases": [],
+                    }
+                )
         except Exception as exc:
             return EstimateResponse(
                 success=False,

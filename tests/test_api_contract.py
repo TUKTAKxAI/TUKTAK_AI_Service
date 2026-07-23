@@ -13,6 +13,13 @@ def test_health() -> None:
     assert response.json()["status"] == "healthy"
 
 
+def test_warmup_status() -> None:
+    response = client.get("/api/v1/warmup")
+
+    assert response.status_code == 200
+    assert "status" in response.json()
+
+
 def test_create_estimate_with_base_price_reference() -> None:
     response = client.post(
         "/api/v1/ai/estimates",

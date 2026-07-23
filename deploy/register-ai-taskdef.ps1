@@ -6,6 +6,7 @@ $Family = "tuktak-ai-service-task"
 $ContainerName = "ai-service"
 $Image = "${AccountId}.dkr.ecr.${Region}.amazonaws.com/tuktak-ai-service:latest"
 $ExecutionRoleArn = "arn:aws:iam::${AccountId}:role/ecsTaskExecutionRole"
+$TaskRoleArn = "arn:aws:iam::${AccountId}:role/tuktak-ai-service-task-role"
 
 $envMap = @{}
 if (Test-Path ".env") {
@@ -52,7 +53,9 @@ $envList = @(
   @{ name = "RISK_RAG_SAFETY_THRESHOLD"; value = "0.60" },
   @{ name = "RISK_RAG_CONTRACT_THRESHOLD"; value = "0.60" },
   @{ name = "RISK_RAG_FIELD_THRESHOLD"; value = "0.65" },
-  @{ name = "AWS_REGION"; value = $Region }
+  @{ name = "AWS_REGION"; value = $Region },
+  @{ name = "WARMUP_ON_STARTUP"; value = "true" },
+  @{ name = "WARMUP_RISK_EMBEDDING"; value = "true" }
 )
 
 foreach ($key in @("NLP_STRUCTURING_HF_REPO_ID", "NLP_STRUCTURING_HF_REVISION", "S3_BUCKET_NAME")) {
@@ -61,10 +64,15 @@ foreach ($key in @("NLP_STRUCTURING_HF_REPO_ID", "NLP_STRUCTURING_HF_REVISION", 
   }
 }
 
+if (-not ($envList | Where-Object { $_.name -eq "S3_BUCKET_NAME" })) {
+  $envList += @{ name = "S3_BUCKET_NAME"; value = "tuktak-ai-estimate-images-086561632397-apne2" }
+}
+
 $taskDef = @{
   family = $Family
   networkMode = "awsvpc"
   requiresCompatibilities = @("EC2")
+  taskRoleArn = $TaskRoleArn
   executionRoleArn = $ExecutionRoleArn
   cpu = "3500"
   memory = "14000"

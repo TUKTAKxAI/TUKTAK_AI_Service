@@ -7,6 +7,5 @@ router = APIRouter(prefix="/ai", tags=["AI Estimate"])
 
 
 @router.post("/estimates", response_model=EstimateResponse)
-async def create_estimate(payload: EstimateRequest) -> EstimateResponse:
+def create_estimate(payload: EstimateRequest) -> EstimateResponse:
     return EstimateService().create_estimate(payload)
-

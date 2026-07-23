@@ -9,6 +9,7 @@ class EstimateRequest(BaseModel):
     description: str = Field(..., min_length=1)
     image_urls: list[str] = Field(default_factory=list)
     image_paths: list[str] = Field(default_factory=list)
+    image_s3_keys: list[str] = Field(default_factory=list)
     main_category_hint: str | None = None
     region_code: str | None = None
 
