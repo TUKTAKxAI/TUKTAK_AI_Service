@@ -2,6 +2,7 @@ from functools import lru_cache
 from pathlib import Path
 
 from app.core.config import settings
+from app.services.torch_device import select_torch_device
 
 
 class ImageEmbeddingService:
@@ -20,7 +21,7 @@ class _NomicVisionRuntime:
         self.torch = torch
         self.functional = F
         self.image_cls = Image
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.device = select_torch_device(torch)
         self.processor = AutoImageProcessor.from_pretrained(settings.image_embedding_model_name)
         self.model = AutoModel.from_pretrained(
             settings.image_embedding_model_name,

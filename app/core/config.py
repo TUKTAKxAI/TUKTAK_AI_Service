@@ -20,6 +20,7 @@ class Settings(BaseSettings):
 
     embedding_model_name: str = "BAAI/bge-m3"
     image_embedding_model_name: str = "nomic-ai/nomic-embed-vision-v1.5"
+    ai_torch_device: str = "auto"
 
     nlp_structuring_model_name: str = "KLUE-RoBERTa-base"
     nlp_structuring_base_model_name: str = "klue/roberta-base"
@@ -40,7 +41,7 @@ class Settings(BaseSettings):
     openai_risk_report_timeout_seconds: float = 60.0
 
     risk_embedding_model_name: str = "jhgan/ko-sroberta-multitask"
-    risk_rag_metadata_path: str | None = "data/rag_documents/02_메타데이터/rag_documents_metadata_통합본.jsonl"
+    risk_rag_metadata_path: str | None = "data/rag_documents/rag_metadata_unified.xlsx"
     risk_rag_top_k: int = 3
     risk_rag_price_threshold: float = 0.30
     risk_rag_extra_cost_threshold: float = 0.55

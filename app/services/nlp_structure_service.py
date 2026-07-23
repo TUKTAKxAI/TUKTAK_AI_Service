@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Any
 
 from app.core.config import settings
+from app.services.torch_device import select_torch_device
 
 
 SINGLE_LABEL_FIELDS = [
@@ -68,7 +69,7 @@ class _NLPStructureRuntime:
         from transformers import AutoConfig, AutoModel, AutoTokenizer
 
         self.torch = torch
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.device = select_torch_device(torch)
         self.model_dir = Path(settings.nlp_structuring_model_path)
         _ensure_model_dir(self.model_dir)
         self.label_maps = _load_json(self.model_dir / "label_maps.json")
