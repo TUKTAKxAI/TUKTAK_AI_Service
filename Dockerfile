@@ -1,4 +1,4 @@
-FROM pytorch/pytorch:2.3.1-cuda12.1-cudnn8-runtime
+FROM python:3.11-slim-bookworm
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
@@ -20,6 +20,8 @@ WORKDIR /app
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         curl \
+        gcc \
+        g++ \
         libglib2.0-0 \
         libgl1 \
         libgomp1 \
@@ -27,6 +29,7 @@ RUN apt-get update \
 
 COPY requirements.txt .
 RUN python -m pip install --upgrade pip \
+    && python -m pip install torch==2.3.1 --index-url https://download.pytorch.org/whl/cu121 \
     && python -m pip install -r requirements.txt
 
 COPY . .
