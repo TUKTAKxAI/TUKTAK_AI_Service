@@ -1,0 +1,17 @@
+.git
+.gitignore
+.vscode
+.agents
+.pytest_cache
+__pycache__
+*.py[cod]
+*.egg-info
+.env
+.env.*
+!.env.example
+tmp
+tests
+docs
+README.md
+data/models
+data/documents

@@ -1,81 +1,53 @@
-# =====================================
 # FastAPI
-# =====================================
-fastapi[standard-no-fastapi-cloud-cli]
-python-multipart
-pydantic
-pydantic-settings
+fastapi[standard-no-fastapi-cloud-cli]==0.139.0
+uvicorn[standard]==0.51.0
+python-multipart==0.0.32
+pydantic==2.13.4
+pydantic-settings==2.14.2
 
-# =====================================
 # LangGraph / LangChain
-# =====================================
-langgraph
-langchain
-langchain-core
-langchain-community
-langchain-text-splitters
+langgraph==1.2.8
+langchain==1.3.12
+langchain-core==1.4.9
+langchain-community==0.4.2
+langchain-text-splitters==1.1.2
 
-# =====================================
 # ChromaDB
-# =====================================
-chromadb
-langchain-chroma
+chromadb==1.5.9
+langchain-chroma==1.1.0
 
-# =====================================
 # Embedding / HuggingFace
-# =====================================
-langchain-huggingface
-huggingface_hub
-sentence-transformers
+langchain-huggingface==1.2.2
+huggingface-hub==0.36.2
+sentence-transformers==5.6.0
 transformers==4.41.2
-accelerate
-safetensors
-einops
+accelerate==1.14.0
+safetensors==0.8.0
+einops==0.8.2
 
-# =====================================
 # LLM Provider
-# OpenAI API를 쓸 경우
-# =====================================
-langchain-openai
-openai
+langchain-openai==1.3.4
+openai==2.44.0
 
-# =====================================
 # Document Processing
-# RAG 문서 처리용
-# =====================================
-pypdf
-beautifulsoup4
-lxml
+pypdf==6.14.2
+beautifulsoup4==4.15.0
+lxml==6.1.1
+openpyxl==3.1.5
 
-# =====================================
 # Image Processing
-# 이미지 품질 검사 / 전처리
-# =====================================
-Pillow
-opencv-python-headless
+Pillow==12.3.0
+opencv-python-headless==5.0.0.93
 
-# =====================================
 # Data / ML
-# =====================================
-numpy
-pandas
-scikit-learn
-joblib
+numpy==2.4.6
+pandas==3.0.3
+scikit-learn==1.9.0
+joblib==1.5.3
 
-# =====================================
 # HTTP / Retry
-# =====================================
-httpx
-tenacity
+httpx==0.28.1
+tenacity==9.1.4
 
-# =====================================
 # AWS
-# S3 이미지 연동용
-# =====================================
-boto3
-
-# =====================================
-# Testing
-# =====================================
-pytest
-pytest-asyncio
+boto3==1.43.44

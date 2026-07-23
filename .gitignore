@@ -20,11 +20,12 @@ env/
 .idea/
 
 # Data
-data/chroma/
 data/documents/
 data/models/
 data/price_reference/base_price_table.xlsx
 !data/price_reference/base_price_table.sample.csv
+!data/chroma/
+!data/chroma/**
 logs/
 tmp/
 
@@ -39,3 +40,7 @@ models/
 # OS
 .DS_Store
 Thumbs.db
+
+# Keep the deployable Chroma index in the Docker build context.
+!data/chroma/
+!data/chroma/**
